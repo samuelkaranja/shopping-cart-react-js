@@ -1,12 +1,17 @@
 import { useContext, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ShoppingCartContext } from "../../context/Context";
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { productDetails, setProductDetails, loading, setLoading } =
-    useContext(ShoppingCartContext);
+  const {
+    productDetails,
+    setProductDetails,
+    loading,
+    setLoading,
+    handleAddToCart,
+    cartItems,
+  } = useContext(ShoppingCartContext);
 
   const fetchProductDetails = async () => {
     const data = await fetch(`https://dummyjson.com/products/${id}`);
@@ -21,10 +26,6 @@ const ProductDetails = () => {
   useEffect(() => {
     fetchProductDetails();
   }, [id]);
-
-  const handleGoToCart = () => {
-    navigate("/cart");
-  };
 
   if (loading) return <h1>Product details loading! Please wait</h1>;
 
@@ -63,8 +64,15 @@ const ProductDetails = () => {
             </div>
             <div>
               <button
-                onClick={handleGoToCart}
-                className="mt-5 min-w-[200px] px-4 py-3 border border-[#333] bg-transparent text-sm font-semibold rounded"
+                disabled={
+                  productDetails
+                    ? cartItems.findIndex(
+                        (item) => item.id === productDetails.id
+                      ) > -1
+                    : false
+                }
+                onClick={() => handleAddToCart(productDetails)}
+                className="disabled: opacity-65 mt-5 min-w-[200px] px-4 py-3 border border-[#333] bg-transparent text-sm font-semibold rounded"
               >
                 Add To Cart
               </button>
